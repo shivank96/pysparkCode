@@ -1,0 +1,7 @@
+Attached sheet has data from 1800's about some key metrics, you will
+need to load this into PySpark, clean the data (make sure there are no
+gaps..use average of the previous 2 reading to plug gaps).
+
+Once you have clean data, create 5yr averages for metrics and add as new
+columns....once you have all of this data then import this data into
+Qlik or D3 charts (see example below)
