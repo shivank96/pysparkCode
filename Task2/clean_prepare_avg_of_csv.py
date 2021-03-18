@@ -12,7 +12,7 @@ from pyspark import SparkContext as sc, SparkConf
 from pyspark.sql.types import DataType, IntegerType
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
-
+import matplotlib.pyplot as pl,numpy,pandas
 
 # ================Function for cleaning null values=================
 def clean_Null():
@@ -70,7 +70,7 @@ def clean_Null():
     df.show()
 
     # creating a new csv fill without null values(cleaned data) using data_frame (df)
-    # create_cleaned_csv(df)
+    create_cleaned_csv(df)
 
 
 # ================Function for cleaning null values of Earnings column=================
@@ -175,7 +175,7 @@ def create_averages_csv(df):
 # ==============Function for preparing average of csv data for every five years==============
 
 def prepare_five_year_avg():
-    # spk_session=SparkSession.builder.appName('Fit_PSSQLApp01').getOrCreate()
+    spk_session=SparkSession.builder.appName('Fit_PSSQLApp01').getOrCreate()
     df = spk_session.read.format('csv').option('header', True).load('new_cleaned.csv')
     df = df.withColumn('id', F.monotonically_increasing_id())
     df.show()
@@ -214,9 +214,34 @@ def prepare_five_year_avg():
     df4.show(30)
     create_averages_csv(df4)
 
+#=====================function for visualizing data using matplotlib=============
+def plot_data():
+    da = pandas.read_csv('five_year_avg.csv')
+    # print(da.head(5))
+    pl.figure(figsize=(10,10))
+    pl.title('Various prices over the years',fontdict={'fontweight':'bold','fontsize':18})
+    pl.plot(da.year,da.avg_sp,'r.-',label='avg_sp')
+    pl.plot(da.year,da.avg_dividend,'g.-',label='avg_dividend')
+    pl.plot(da.year,da.avg_real_dividend,'b.-',label='avg_real_dividend')
+    pl.plot(da.year,da.avg_earnings,'y.-',label='avg_earnings')
+    pl.plot(da.year,da.avg_real_earning,'m.-',label='avg_real_earnings')
+    pl.plot(da.year,da.avg_pe10,'k.-',label='avg_pe10')
+    pl.plot(da.year,da.max_consumer_price_index,'c.-',label='max_consumer_price_index')
+    pl.plot(da.year,da.avg_long_interest_rate,'r.-',label='avg_long_interest_rate')
+    pl.plot(da.year,da.avg_real_price,'k.-',label='avg_real_price')
+    pl.xticks(da.year[::2].tolist()+[2021])
+    pl.xlabel('Year',fontdict={'fontweight':'bold','fontsize':14})
+    pl.ylabel('Prices',fontdict={'fontweight':'bold','fontsize':14})
+    pl.legend()
+    pl.savefig('five_year_avg_visualization4.png',dpi=300)
+    pl.show()
+
 
 # calling clean_Null() function
 clean_Null()
 
 # calling prepare_five_year_avg() function
 prepare_five_year_avg()
+
+#calling plot_data() function for visualizing data using matplotlib
+plot_data()
